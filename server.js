@@ -14,7 +14,7 @@ io.on('connection', function(socket){
 		if(data.type=='user'){
 			height = data.height;
 			width = data.width;
-		}else if(type=='panel'){
+		}else if(data.type=='panel'){
 			socket.emit('window', {
 				width: width,
 				height: height
