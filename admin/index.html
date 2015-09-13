@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Admin Page</title>
+		<script src="../node_modules/socket.io-client/socket.io.js"></script>
+		<style>
+			#clicker{
+				position: fixed;
+				margin-left: -15px;
+				margin-top: -15px;
+				width: 30px;
+				height: 30px;
+				background-color: #FFB752;
+				-webkit-border-radius: 50px;
+				-moz-border-radius: 50px;
+				border-radius: 50px;
+				-webkit-transition: -webkit-transition 0.1s;
+    			transition: transform 0.1s;
+				
+				-webkit-transform: scale(0,0);
+				transform: scale(0,0);
+
+			}
+			#mouse{
+				position: fixed;
+				margin-left: -15px;
+				margin-top: -15px;
+				width: 0px;
+				height: 0px;
+				
+				-webkit-transition: all 0.1s;
+    			transition: all 0.1s;
+
+    			border-left: 10px solid transparent;
+    			border-right: 10px solid transparent;
+    			border-top: 20px solid transparent;
+    			border-bottom: 20px solid black;
+    			transform: rotate(-25deg);
+    			-webkit-transform: rotate(-25deg);
+			}
+			#mouse:after{
+				position: absolute;
+				left: -3px;
+				top: 18px;
+				width: 6px;
+				height: 10px;
+				background-color: black;
+				content: '';
+
+			}
+		</style>
+	</head>
+	<body>
+		<div id="clicker"></div>
+		<div id="mouse"></div>
+		<h1>Admin Page</h1>
+		<hr />
+		<button onclick="alert('i am clicked')">Click Me</button>
+		<script>
+		var socket = io('ws://localhost:9999');
+		socket.on('connect', function(){
+			Register();
+		})
+		Register = function(){
+			socket.emit('Register', {
+				type: 'admin'
+			});
+			socket.on('click', function(data){
+				document.getElementById('mouse').style.display =  'none';
+
+				var el = document.elementFromPoint(data.x, data.y);
+				el.click();
+				document.getElementById('mouse').style.display =  'block';
+
+				document.getElementById('clicker').style.left = data.x + 'px';
+				document.getElementById('clicker').style.top = data.y + 'px';
+
+				document.getElementById('clicker').style['-webkit-transform'] = 'scale(1,1)';
+				document.getElementById('clicker').style['transform'] = 'scale(1,1)';
+				
+				setTimeout(function(){
+					document.getElementById('clicker').style['-webkit-transform'] = 'scale(0,0)';
+					document.getElementById('clicker').style['transform'] = 'scale(0,0)';
+				}, 100);
+
+
+
+
+
+
+			})
+			socket.on('mouse', function(data){
+				document.getElementById('mouse').style.left = data.x + 'px';
+				document.getElementById('mouse').style.top = data.y + 'px';
+			})
+
+		}
+
+
+
+		</script>
+	</body>
+</html>

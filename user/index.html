@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>User Page</title>
+		<script src="../node_modules/socket.io-client/socket.io.js"></script>
+	</head>
+	<body>
+		<h1>User Page</h1>
+		<hr />
+		<button onclick="alert('i am clicked')">Click Me</button>
+		<script>
+		var socket = io('ws://localhost:9999');
+		socket.on('connect', function(){
+			Register();
+		})
+		Register = function(){
+			socket.emit('Register', {
+				type: 'user',
+				height: window.innerHeight,
+				width: window.innerWidth
+			});
+		}
+
+
+		function handleEvent(e){
+			var evt = e ? e:window.event;
+			var clickX=0, clickY=0;
+
+			if ((evt.clientX || evt.clientY) && document.body && document.body.scrollLeft!=null) {
+				clickX = evt.clientX + document.body.scrollLeft;
+				clickY = evt.clientY + document.body.scrollTop;
+			}
+			if ((evt.clientX || evt.clientY) && document.compatMode=='CSS1Compat' && document.documentElement && document.documentElement.scrollLeft!=null) {
+				clickX = evt.clientX + document.documentElement.scrollLeft;
+				clickY = evt.clientY + document.documentElement.scrollTop;
+			}
+			if (evt.pageX || evt.pageY) {
+				clickX = evt.pageX;
+				clickY = evt.pageY;
+			}
+			socket.emit('click', {x:clickX, y:clickY})
+			return false;
+		}
+
+		document.addEventListener('click', function(e){
+			handleEvent(e);
+		})
+
+		var nextMove = 0;
+		var x = 0;
+		var y = 0;
+		var timer = null;
+		document.addEventListener('mousemove', function(e){
+			var now = new Date().getTime();
+			if(now>=nextMove){
+				nextMove = new Date().getTime()+300;
+				var e = window.event;
+				var posX = e.clientX;
+				var posY = e.clientY;
+				socket.emit('mouse', {x:posX, y:posY})
+			}
+			clearTimeout(timer);
+			timer = setTimeout(function(){
+				socket.emit('mouse', {x:e.clientX, y:e.clientY})
+			}, 400);
+		})
+
+
+		</script>
+	</body>
+</html>
