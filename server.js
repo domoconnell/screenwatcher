@@ -1,5 +1,8 @@
 var io = require('socket.io')(9999);
 var connections = [];
+var height = 0;
+var width = 0;
+
 
 io.on('connection', function(socket){
 	socket.on('Register', function(data){
@@ -7,6 +10,15 @@ io.on('connection', function(socket){
 		var newConn = {
 			socket: socket,
 			data: data
+		}
+		if(data.type=='user'){
+			height = data.height;
+			width = data.width;
+		}else if(type=='panel'){
+			socket.emit('window', {
+				width: width,
+				height: height
+			})
 		}
 		connections.push(newConn);
 	})
